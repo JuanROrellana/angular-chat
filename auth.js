@@ -1,25 +1,42 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-const user = mongoose.model('user');
+const User = mongoose.model('User');
 
-exports.authenticate = (memail, password) => {
-    return new Promise((resolve, reject) => {
-        try{
+exports.authenticate = (email, password) => {
+    return new Promise(async (resolve, reject) => {
+        try {
             //Get user by Email
-            const user = await User.findOne({email});
-            bcrypt.compare(password, user.password, (err, isMatch) => {
-                if(err) throw err;
-                if(isMatch){
-                    resolve(user);
-                }else{
-                    //Pass did not match
-                    reject('Autenthication Failed');
-                }
+            const user = await User.findOne({
+                email
             });
 
-        }catch(err){
+            //Decript User
+            bcrypt.compare(password, user.password, (err, res) => {
+                if(res) {
+                    if (res) {
+                        console.log('Exito Es bueno el pass');
+                        resolve(user);
+                    }
+                } else {
+                    resolve('Error');
+                } 
+              });
+
+            // bcrypt.compare(password, user.password, (err, isMatch) => {
+            //     try{
+            //         if (isMatch) {
+            //             console.log('Exito Es bueno el pass');
+            //             resolve(user);
+
+            //         }
+            //     } catch (err){
+            //         reject('Autenthication Failed');
+            //     }
+               
+            // });
+        } catch (err) {
             //Email no found
             reject('Autenthication Failed');
         }
-    });    
+    });
 }

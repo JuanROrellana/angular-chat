@@ -1,8 +1,10 @@
 const errors = require('restify-errors');
 const Customer = require('../models/Customers');
+const rjwt = require('restify-jwt-community');
+const config = require('../config');
 
 module.exports = server => {
-    server.get('/customers', async (req, res, next) => {
+    server.get('/customers',  async (req, res, next) => {
         //Get Customers
         try {
             const customers = await Customer.find({});
@@ -30,7 +32,7 @@ module.exports = server => {
     });
 
     //Add Customer
-    server.post('/customers', async (req, res, next) => {
+    server.post('/customers', rjwt({secret: config.JWT_SECRET}), async (req, res, next) => {
         //Check for json
         if (!req.is('application/json')) {
             return next(new errors.BadRequestError('Expect application/json'));
